@@ -15,7 +15,7 @@ This project is a simple To-Do List application implemented in React. It provide
 
 ## Screenshots
 
-_Place screenshots of your application here if you have any._
+![To-Do List Screenshot](src/assets/pic-1.png)
 
 ## How to Run
 
