@@ -194,10 +194,12 @@ textarea {
   margin: 30px;
 }
 
-.radio-btns:hover {
+.radio-btns-glow {
   background-color: #646cff;
   box-shadow: 0 0 10px #646cff;
 }
+
+
 
 .newdate {
   text-align: left;
@@ -224,4 +226,25 @@ textarea {
 
 .strike-through {
   text-decoration: line-through;
+  color: magenta;
+}
+
+.strike-through::after {
+  content: "(Completed)";
+  color: red;
+  margin-left: 1rem;
+}
+
+
+*::-webkit-scrollbar,
+*::-webkit-scrollbar-thumb {
+  width: 26px;
+  border-radius: 13px;
+  background-clip: padding-box;
+  border: 10px solid transparent;
+}
+
+
+*::-webkit-scrollbar-thumb {
+  box-shadow: inset 0 0 0 10px;
 }
