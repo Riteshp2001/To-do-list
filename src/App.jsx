@@ -1,252 +1,249 @@
-/* eslint-disable react/prop-types */
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 function App() {
-	const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState([]);
 
-	useEffect(() => {
-		setTasks(JSON.parse(localStorage.getItem("tasks")));
-	}, []);
+  // useEffect(() => {
+  //   if (localStorage.getItem("tasks") !== undefined || null) {
+  //     const storedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
+  //     if (storedTasks) setTasks(storedTasks);
+  //   }
+  // }, []);
 
-	const handleAddTask = (taskText, day) => {
-		const currentDate = new Date().toLocaleDateString();
-		const minitask = {
-			time: new Date().toLocaleTimeString(),
-			text: taskText,
-			taskId: (Math.random() + 1000).toString(),
-			isEditable: false,
-			strike: false,
-		};
+  const updateTasks = (updatedTasks) => {
+    setTasks(updatedTasks);
+    // localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+  };
 
-		if (currentDate === day && tasks.length !== 0) {
-			setTasks((prevTasks) => {
-				const newTasks = prevTasks.map((task) => {
-					if (task.day === currentDate) {
-						return {
-							...task,
-							weekdayTasks: [...task.weekdayTasks, minitask],
-						};
-					}
-					return task;
-				});
+  const handleAddTask = (taskText, day) => {
+    const currentDate = new Date().toLocaleDateString();
+    const newTask = {
+      day: currentDate,
+      weekday: new Date().toLocaleDateString("en-US", { weekday: "long" }),
+      weekdayTasks: [
+        {
+          time: new Date().toLocaleTimeString(),
+          text: taskText,
+          taskId: (Math.random() * 1000).toString(),
+          isEditable: false,
+          strike: false,
+        },
+      ],
+    };
 
-				localStorage.setItem("tasks", JSON.stringify(newTasks));
-				return newTasks;
-			});
-		} else {
-			const newTask = {
-				day: new Date().toLocaleDateString(),
-				weekday: new Date().toLocaleDateString("en-US", { weekday: "long" }),
-				weekdayTasks: [minitask],
-			};
+    const updatedTasks = tasks.map((task) => {
+      if (task.day === currentDate) {
+        task.weekdayTasks.push(newTask.weekdayTasks[0]);
+        return task;
+      }
+      return task;
+    });
 
-			localStorage.setItem("tasks", JSON.stringify(newTask));
-			setTasks((prevTasks) => [...prevTasks, newTask]);
-		}
-	};
+    if (!updatedTasks.some((task) => task.day === currentDate)) {
+      updatedTasks.push(newTask);
+    }
 
-	return (
-		<div>
-			<Header />
-			<Time />
-			<div className="task-container">
-				<TextArea onAddTask={handleAddTask} />
-				<DayTasks tasks={tasks} setTasks={setTasks} />
-			</div>
-		</div>
-	);
+    updateTasks(updatedTasks);
+  };
+
+  return (
+    <div>
+      <Header />
+      <Time />
+      <div className="task-container">
+        <TextArea onAddTask={handleAddTask} />
+        <DayTasks tasks={tasks} updateTasks={updateTasks} />
+      </div>
+    </div>
+  );
 }
 
-//no changes
 function Header() {
-	return (
-		<div>
-			<h1>Simple To-Do-List</h1>
-			<h2>
-				-by <a href="https://riteshp2001.github.io/Personal-Portfolio/">Ritesh Pandit</a>{" "}
-			</h2>
-		</div>
-	);
+  return (
+    <div>
+      <h1>Simple To-Do-List</h1>
+      <h2>
+        -by <a href="https://riteshp2001.github.io/Personal-Portfolio/">Ritesh Pandit</a>{" "}
+      </h2>
+    </div>
+  );
 }
 
-//no changes
 function Time() {
-	const [time, setTime] = useState(new Date().toLocaleTimeString());
+  const [time, setTime] = useState(new Date().toLocaleTimeString());
 
-	useEffect(() => {
-		const intervalId = setInterval(() => {
-			setTime(new Date().toLocaleTimeString());
-		}, 1000);
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setTime(new Date().toLocaleTimeString());
+    }, 1000);
 
-		return () => {
-			clearInterval(intervalId);
-		};
-	}, []);
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
 
-	return (
-		<div>
-			<h3>{time}</h3>
-		</div>
-	);
+  return (
+    <div>
+      <h3>{time}</h3>
+    </div>
+  );
 }
 
 function TextArea({ onAddTask }) {
-	let [inpVal, setInpVal] = useState("");
+  const [inpVal, setInpVal] = useState("");
 
-	function handleSubmit(event) {
-		event.preventDefault();
-		onAddTask(inpVal, new Date().toLocaleDateString());
-		setInpVal("");
-	}
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    onAddTask(inpVal);
+    setInpVal("");
+  };
 
-	function setVal(event) {
-		setInpVal((inpVal) => {
-			inpVal = event.target.value;
-			return inpVal;
-		});
-	}
-
-	return (
-		<form action="" onSubmit={handleSubmit}>
-			<div className="add-list">
-				<input
-					type="text"
-					name="text-row"
-					id="txt"
-					placeholder="Enter your Task"
-					className="list"
-					onChange={setVal}
-					autoFocus={true}
-					value={inpVal}
-				/>
-				<button type="button" value="Add +" id="addbtn" onClick={handleSubmit}>
-					Add+
-				</button>
-			</div>
-		</form>
-	);
+  return (
+    <form action="" onSubmit={handleSubmit}>
+      <div className="add-list">
+        <input
+          type="text"
+          name="text-row"
+          id="txt"
+          placeholder="Enter your Task"
+          className="list"
+          onChange={(event) => setInpVal(event.target.value)}
+          autoFocus={true}
+          value={inpVal}
+        />
+        <button type="submit" value="Add +" id="addbtn">
+          Add+
+        </button>
+      </div>
+    </form>
+  );
 }
 
-function DayTasks({ tasks, setTasks }) {
-	return (
-		<>
-			{tasks.map((task) => (
-				<div className="newdate" key={task.date}>
-					<h2>{task.weekday}</h2>
-					<span>{task.day}</span>
-					<div className="inner-newdate-lists">
-						<ul>
-							{task.weekdayTasks.map((weekdayTask) => (
-								<TaskLists key={weekdayTask.taskId} task={weekdayTask} setAllTasks={setTasks} />
-							))}
-						</ul>
-					</div>
-				</div>
-			))}
-		</>
-	);
+function DayTasks({ tasks, updateTasks }) {
+  return (
+    <>
+      {tasks.map((task) => (
+        <div className="newdate" key={task.day}>
+          <h2>{task.weekday}</h2>
+          <span>{task.day}</span>
+          <div className="inner-newdate-lists">
+            <ul>
+              {task.weekdayTasks.map((weekdayTask) => (
+                <TaskLists
+                  key={weekdayTask.taskId}
+                  task={weekdayTask}
+                  allTasks={task}
+                  updateTasks={updateTasks}
+                />
+              ))}
+            </ul>
+          </div>
+        </div>
+      ))}
+    </>
+  );
 }
 
-function TaskLists({ task, setAllTasks }) {
-	let [text, setText] = useState(task.text);
-	let [isEditable, setIsEditable] = useState(task.isEditable);
-	let [strike, setStrike] = useState(task.strike);
-	let ogText = task.text;
-	let changabletext = text;
-	let textVal = "";
+function TaskLists({ task, allTasks, updateTasks }) {
+  const handleToggleStrike = () => {
+    const updatedTask = { ...task, strike: !task.strike };
+    updateTask(updatedTask);
+  };
 
-	function toggleStrikeThrough() {
-		setStrike(!strike);
-	}
+  const handleEditableClick = () => {
+    const updatedTask = { ...task, isEditable: true };
+    updateTask(updatedTask);
+  };
 
-	function handleEditableClick() {
-		setIsEditable(true);
-	}
+  const handleCancelEdit = () => {
+    const updatedTask = { ...task, isEditable: false };
+    updateTask(updatedTask);
+  };
 
-	function cancelEdit() {
-		setText((text) => {
-			text = ogText;
-			return text;
-		});
-		setIsEditable(false);
-	}
+  const handleSaveEdit = () => {
+    const updatedTask = { ...task, isEditable: false };
+    updateTask(updatedTask);
+  };
 
-	function saveEdit() {
-		setText((text) => {
-			text = changabletext;
-			task.text = changabletext;
-			return text;
-		});
-		setIsEditable(false);
-	}
+  const handleTextChange = (event) => {
+    const updatedTask = { ...task, text: event.target.value };
+    updateTask(updatedTask);
+  };
 
-	function handleTextChange(event) {
-		textVal += event.target.value;
-		console.log(textVal);
-		setText((text) => {
-			text = textVal;
-			return text;
-		});
-	}
+  const handleDeleteClick = () => {
+    const updatedTasks = allTasks.weekdayTasks.filter(
+      (weekdayTask) => weekdayTask.taskId !== task.taskId
+    );
+    if (updatedTasks.length === 0) {
+      // Remove the whole parent task
+      updateTasks((prevTasks) =>
+        prevTasks.filter((prevTask) => prevTask.day !== allTasks.day)
+      );
+    } else {
+      const updatedParentTask = { ...allTasks, weekdayTasks: updatedTasks };
+      updateTasks((prevTasks) =>
+        prevTasks.map((prevTask) =>
+          prevTask.day === allTasks.day ? updatedParentTask : prevTask
+        )
+      );
+    }
+  };
 
-	function handleDeleteClick() {
-		setAllTasks(() => {
-			let tempTaskArr = JSON.parse(localStorage.getItem("tasks"));
-			tempTaskArr = tempTaskArr.map((singletask) => {
-				if (singletask.id === task.id) {
-					if (singletask.weekdayTasks.length === 0) {
-						return null;
-					} else {
-						return {
-							...singletask,
-							weekdayTasks: singletask.weekdayTasks.filter((weekdayTask) => {
-								return weekdayTask.taskId !== task.taskId;
-							}),
-						};
-					}
-				}
-				return singletask;
-			});
-			localStorage.setItem("tasks", JSON.stringify(tempTaskArr));
-			return tempTaskArr;
-		});
-	}
+  const updateTask = (updatedTask) => {
+    const updatedTasks = allTasks.weekdayTasks.map((weekdayTask) =>
+      weekdayTask.taskId === task.taskId ? updatedTask : weekdayTask
+    );
+    const updatedParentTask = { ...allTasks, weekdayTasks: updatedTasks };
+    updateTasks((prevTasks) =>
+      prevTasks.map((prevTask) =>
+        prevTask.day === allTasks.day ? updatedParentTask : prevTask
+      )
+    );
+  };
 
-	return (
-		<li>
-			<div className="radio-parent">
-				<div className={`radio-btns ${strike ? "radio-btns-glow" : ""}`} onClick={toggleStrikeThrough}></div>
-				<div>{task.time}</div>
-			</div>
-			<div className="added-list">
-				{!isEditable ? (
-					<div className="centerText">
-						<p className={`added ${strike ? "strike-through" : ""}`}>{text}</p>
-					</div>
-				) : (
-					<div className="centerText">
-						<textarea className="added editable" onInput={handleTextChange}>
-							{text}
-						</textarea>
-					</div>
-				)}
-				<div className="popup">
-					{!isEditable && (
-						<>
-							<i className="ri-delete-bin-2-line" id="deletebtn" onClick={handleDeleteClick}></i>
-							<i className="ri-edit-fill" id="editbtn" onClick={handleEditableClick}></i>
-						</>
-					)}
-					{isEditable && (
-						<>
-							<i className="ri-check-line" id="saveeditbtn" onClick={saveEdit}></i>
-							<i className="ri-close-circle-fill" id="canceleditbtn" onClick={cancelEdit}></i>
-						</>
-					)}
-				</div>
-			</div>
-		</li>
-	);
+  return (
+    <li>
+      <div className="radio-parent">
+        <div
+          className={`radio-btns ${task.strike ? "radio-btns-glow" : ""}`}
+          onClick={handleToggleStrike}
+        ></div>
+        <div>{task.time}</div>
+      </div>
+      <div className="added-list">
+        {!task.isEditable ? (
+          <div className="centerText">
+            <p className={`added ${task.strike ? "strike-through" : ""}`}>{task.text} </p>
+          </div>
+        ) : (
+          <div className="centerText">
+            <textarea
+              className="added editable"
+              value={task.text}
+              onChange={handleTextChange}
+            />
+          </div>
+        )}
+        <div className="popup">
+          {!task.isEditable ? (
+            <>
+              <i
+                className="ri-delete-bin-2-line"
+                id="deletebtn"
+                onClick={handleDeleteClick}
+              ></i>
+              <i className="ri-edit-fill" id="editbtn" onClick={handleEditableClick}></i>
+            </>
+          ) : (
+            <>
+              <i className="ri-check-line" id="saveeditbtn" onClick={handleSaveEdit}></i>
+              <i className="ri-close-circle-fill" id="canceleditbtn" onClick={handleCancelEdit}></i>
+            </>
+          )}
+        </div>
+      </div>
+    </li>
+  );
 }
 
 export default App;
