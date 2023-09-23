@@ -16,6 +16,7 @@ function App() {
   };
 
   const handleAddTask = (taskText, day) => {
+    if(taskText==="")return;
     const currentDate = new Date().toLocaleDateString();
     const newTask = {
       day: currentDate,
