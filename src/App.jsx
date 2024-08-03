@@ -64,7 +64,7 @@ function Header() {
     <div>
       <h1>Simple To-Do-List</h1>
       <h2>
-        -by <a href="https://riteshp2001.github.io/Personal-Portfolio/">Ritesh Pandit</a>{" "}
+        -by <a href="https://riteshpandit.vercel.app/">Ritesh Pandit</a>{" "}
       </h2>
     </div>
   );
